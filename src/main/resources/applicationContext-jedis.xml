@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<context:property-placeholder location="classpath*:redis.properties" />
+	<context:property-placeholder
+		ignore-unresolvable="true" location="classpath:redis.properties" />
+	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal" value="${redis.maxTotal}" />
+		<property name="minIdle" value="${redis.minIdle}" />
+		<property name="maxWaitMillis" value="${redis.maxWaitTime}" />
+		<property name="maxIdle" value="${redis.maxIdle}" />
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
+		<property name="testOnReturn" value="true" />
+		<property name="testWhileIdle" value="true" />
+	</bean>
+	<bean id="jedisSentinelPool" class="redis.clients.jedis.JedisSentinelPool">
+		<constructor-arg index="0" value="mymaster" />
+		<constructor-arg index="1">
+			<set>
+				<value>${redis.sentinel1.host}:${redis.sentinel1.port}</value>
+				<value>${redis.sentinel2.host}:${redis.sentinel2.port}</value>
+			</set>
+		</constructor-arg>
+		<constructor-arg index="2" ref="poolConfig" />
+		<constructor-arg index="3" value="${redis.password}" />
+		<!-- 如果redis密码为空，则使用如下注入方式 -->
+		<!-- <constructor-arg index="3"><null /></constructor-arg> -->
+	</bean>
+
+
+	<bean id="job" class="com.infly.common.util.quartz.Job">
+	</bean>
+
+	<bean id="task1"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="job" />
+		</property>
+		<property name="targetMethod">
+			<value>task1</value>
+		</property>
+	</bean>
+	<bean id="task1Trigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="task1" />
+		</property>
+		<property name="cronExpression">
+			<value>0/5 * * * * ?</value>
+		</property>
+	</bean>
+
+	<bean id="task2"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref bean="job" />
+		</property>
+		<property name="targetMethod">
+			<value>task2</value>
+		</property>
+	</bean>
+	<bean id="task2Trigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref bean="task2" />
+		</property>
+		<property name="cronExpression">
+			<value>0/5 * * * * ?</value>
+		</property>
+	</bean>
+
+	<bean id="jobFactory"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref local="task1Trigger" />
+				<ref local="task2Trigger" />
+			</list>
+		</property>
+		<property name="autoStartup" value="false" />
+	</bean>
+
+</beans> 

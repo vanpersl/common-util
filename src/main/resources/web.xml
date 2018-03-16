@@ -51,6 +51,10 @@
 		<url-pattern>/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
+	
+	<listener>
+        <listener-class>com.infly.common.util.quartz.JobStartListener</listener-class>
+    </listener>
 
 
 	<welcome-file-list>
