@@ -1,4 +1,4 @@
-package com.infly.common.util.https;
+package com.infly.common.util.http.depre;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -9,6 +9,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+@Deprecated
 public class SslUtil {
 
   private static void trustAllHttpsCertificates() {

@@ -1,4 +1,4 @@
-package com.infly.common.util.https;
+package com.infly.common.util.http.depre;
 
 
 import java.io.BufferedReader;
@@ -9,9 +9,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Deprecated
 public class HttpsUtil {
 
   public static void main(String[] args) {
